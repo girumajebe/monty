@@ -1,4 +1,4 @@
-# 0x18. C - Stacks, Queues - LIFO, FIFO
+# 0x19. C - Stacks, Queues - LIFO, FIFO
 
   <h3>Compilation &amp; Output</h3>
   <p>The code should be compiled this way:</p>
