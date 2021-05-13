@@ -1,7 +1,19 @@
 #include "monty.h"
 
-/* global struct to hold flag for queue and stack length */
-var_t var;
+/**
+ * init - sets initial values for data
+ * @vars: global variable
+ * Return: (vars)
+ */
+var_t init(var_t vars)
+{
+	vars.file = NULL;
+	vars.line = NULL;
+	vars.stack = NULL;
+	vars.line_number = 1;
+	vars.state = 0;
+	return (vars);
+}
 
 /**
  * main - Monty bytecode interpreter
@@ -12,41 +24,43 @@ var_t var;
  */
 int main(int argc, char *argv[])
 {
-	stack_t *stack = NULL;
-	unsigned int line_number = 0;
-	FILE *fs = NULL;
-	char *lineptr = NULL, *op = NULL;
+	var_t vars;
+	char *val, *op = NULL;
 	size_t n = 0;
 
-	var.queue = 0;
-	var.stack_len = 0;
+	vars = init(vars);
 	if (argc != 2)
 	{
 		dprintf(STDOUT_FILENO, "USAGE: monty file\n");
 		exit(EXIT_FAILURE);
 	}
-	fs = fopen(argv[1], "r");
-	if (fs == NULL)
+	vars.file = fopen(argv[1], "r");
+	if (vars.file == NULL)
 	{
 		dprintf(STDOUT_FILENO, "Error: Can't open file %s\n", argv[1]);
 		exit(EXIT_FAILURE);
 	}
-	on_exit(free_lineptr, &lineptr);
-	on_exit(free_stack, &stack);
-	on_exit(m_fs_close, fs);
-	while (getline(&lineptr, &n, fs) != -1)
+	while (getline(&vars.line, &n, vars.file) != -1)
 	{
-		op = strtok(lineptr, "\n\t\r ");
+		op = strtok(vars.line, "\n\t\r ");
 		if (*op == '#' || *op == '\n')
 		{
-			line_number++;
+			vars.line_number++;
+			continue;
+		}
+		if (strcmp(op, "push") == 0)
+		{
+			val = strtok(NULL, " ");
+			vars = m_push2(val, vars);
+			vars.line_number++;
 			continue;
 		}
 		if (op != NULL && op[0] != '#')
 		{
-			get_op(op, &stack, line_number);
+			get_op(op, &vars.stack, vars.line_number);
 		}
-		line_number++;
+		vars.line_number++;
 	}
+	free_strct(vars);
 	exit(EXIT_SUCCESS);
 }

@@ -8,23 +8,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-
-/**
- * struct var_s - struct to contain the main variables of the Monty interpreter
- * @queue: flag to determine if in stack vs queue mode
- * @stack_len: length of the stack
- */
-typedef struct var_s
-{
-	int queue;
-	size_t stack_len;
-} var_t;
-
-#define STACK 0
-#define QUEUE 1
-
-/* global struct to hold flag for queue and stack length */
-extern var_t var;
+#include <ctype.h>
+#include <stdbool.h>
 
 /**
  * struct stack_s - doubly linked list representation of a stack (or queue)
@@ -56,9 +41,29 @@ typedef struct instruction_s
 	void (*f)(stack_t **stack, unsigned int line_number);
 } instruction_t;
 
+/**
+ * struct strct_s - struct of info's structs
+ * @file: monty file
+ * @line: line file
+ * @stack: stack_t list
+ * @line_number: line number
+ * @state: int 0
+ * Description: global struct with program info
+ */
+typedef struct var_s
+{
+	FILE *file;
+	char *line;
+	stack_t *stack;
+	unsigned int line_number;
+	int state;
+} var_t;
+
+extern var_t vars;
+
 void get_op(char *op, stack_t **stack, unsigned int line_number);
-void m_push(stack_t **stack, unsigned int line_number);
-void m_push2(stack_t **stack, int n);
+var_t m_push(char *param, var_t vars);
+var_t m_push2(char *param, var_t vars);
 void m_pall(stack_t **stack, unsigned int line_number);
 void m_pint(stack_t **stack, unsigned int line_number);
 void m_pop(stack_t **stack, unsigned int line_number);
@@ -71,13 +76,11 @@ void m_div(stack_t **stack, unsigned int line_number);
 void m_mod(stack_t **stack, unsigned int line_number);
 void rotl(stack_t **stack, unsigned int line_number);
 void rotr(stack_t **stack, unsigned int line_number);
-void m_stack(stack_t **stack, unsigned int line_number);
-void m_queue(stack_t **stack, unsigned int line_number);
 void m_pchar(stack_t **stack, unsigned int line_number);
 void m_pstr(stack_t **stack, unsigned int line_number);
-void free_stack(int status, void *arg);
+var_t free_strct(var_t vars);
+void free_stack1(stack_t *head);
 void m_fs_close(int status, void *arg);
 void free_lineptr(int status, void *arg);
-stack_t *add_node(stack_t **stack, const int n);
 
 #endif /* _MONTY_H_ */

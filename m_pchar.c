@@ -12,7 +12,7 @@ void m_pchar(stack_t **stack, unsigned int line_number)
 {
 	int ch;
 
-	if (var.stack_len < 1)
+	if (!(*stack))
 	{
 		dprintf(STDOUT_FILENO,
 			"L%u: can't pchar, stack empty\n",

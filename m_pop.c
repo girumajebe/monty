@@ -10,20 +10,19 @@
 void m_pop(stack_t **stack, unsigned int line_number)
 {
 	stack_t *pop = *stack;
+	stack_t *next;
 
-	if (var.stack_len == 0)
+	if (!pop)
 	{
 		dprintf(STDOUT_FILENO,
 			"L%u: can't pop an empty stack\n",
 			line_number);
 		exit(EXIT_FAILURE);
 	}
-	(*stack)->next->prev = (*stack)->prev;
-	(*stack)->prev->next = (*stack)->next;
-	if (var.stack_len != 1)
-		*stack = (*stack)->next;
-	else
-		*stack = NULL;
+	next = pop->next;
 	free(pop);
-	var.stack_len--;
+	*stack = next;
+	pop = *stack;
+	if (pop)
+		pop->prev = NULL;
 }

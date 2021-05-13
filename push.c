@@ -1,5 +1,4 @@
 #include "monty.h"
-#include <ctype.h>
 
 /**
  * check_for_digit - checks that a string only contains digits
@@ -23,29 +22,100 @@ static int check_for_digit(char *arg)
 
 /**
  * m_push - push an integer onto the stack
- * @stack: double pointer to the beginning of the stack
- * @line_number: script line number
+ * @param: node
+ * @vars: struct of variables
  *
- * Return: void
+ * Return: vars
  */
-void m_push(stack_t **stack, unsigned int line_number)
-{
-	char *arg;
-	int n;
 
-	arg = strtok(NULL, "\n\t\r ");
-	if (arg == NULL || check_for_digit(arg))
+var_t m_push(char *param, var_t vars)
+{
+	int n;
+	stack_t *new, *current = vars.stack;
+	char *arg = NULL;
+
+        arg = strchr(param, '\n');
+        if (arg)
+                *arg = 0;
+	if (!strlen(param) || check_for_digit(param))
 	{
 		dprintf(STDOUT_FILENO,
-			"L%u: usage: push integer\n",
-			line_number);
+			"L%d: usage: push integer\n",
+			vars.line_number);
+		fclose(vars.file);
+		free(vars.line);
+		free_stack1(vars.stack);
 		exit(EXIT_FAILURE);
 	}
-	n = atoi(arg);
-	if (!add_node(stack, n))
+	n = atoi(param);
+	new = malloc(sizeof(stack_t));
+	if (!new)
 	{
-		dprintf(STDOUT_FILENO, "Error: malloc failed\n");
+		dprintf(STDERR_FILENO, "Error: malloc failed\n");
+		fclose(vars.file);
+		free(vars.line);
+		free_stack1(vars.stack);
 		exit(EXIT_FAILURE);
 	}
-	var.stack_len++;
+	new->n = n;
+	new->next = NULL;
+	if (!current)
+	{
+		new->prev = NULL;
+		vars.stack = new;
+		return (vars);
+	}
+	while (current->next)
+	{
+		current = current->next;
+	}
+	current->next = new;
+	new->prev = current;
+	return (vars);
+}
+
+/**
+ * m_push2 - push an integer onto the stack
+ * @param: node
+ * @vars: struct of variables
+ *
+ * Return: vars
+ */
+
+var_t m_push2(char *param, var_t vars)
+{
+	int n;
+	stack_t *new;
+	char *arg = NULL;
+
+	arg = strchr(param, '\n');
+	if (arg)
+		*arg = 0;
+	if (!strlen(param) || check_for_digit(param))
+	{
+		dprintf(STDERR_FILENO,
+			"L%d: usage: push integer\n",
+			vars.line_number);
+		fclose(vars.file);
+		free(vars.line);
+		free_stack1(vars.stack);
+		exit(EXIT_FAILURE);
+	}
+	n = atoi(param);
+	new = malloc(sizeof(stack_t));
+	if (!new)
+	{
+		dprintf(STDERR_FILENO, "Error: malloc failed\n");
+		fclose(vars.file);
+		free(vars.line);
+		free_stack1(vars.stack);
+		exit(EXIT_FAILURE);
+	}
+	new->n = n;
+	new->next = vars.stack;
+	new->prev = NULL;
+	if (new->next)
+		new->next->prev = new;
+	vars.stack = new;
+	return (vars);
 }
