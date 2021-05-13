@@ -20,6 +20,9 @@ void get_op(char *op, stack_t **stack, unsigned int line_number)
 		{"add", add},
 		{"nop", nop},
 		{"sub", sub},
+		{"div", m_div},
+		{"mul", mul},
+		{"mod", mod},
 		{"stack", m_stack},
 		{"queue", queue},
 		{NULL, NULL}
